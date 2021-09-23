@@ -21,10 +21,34 @@ const users = [
     { id: 17, name: 'User 17'},
     { id: 18, name: 'User 18'},
     { id: 19, name: 'User 19'},
-    { id: 20, name: 'User 20'},
+    { id: 20, name: 'User 20'}
 ]
 
 app.get('/users', (req, res) => {
-    res.json(users)
+    const page = parseInt(req.query.page)
+    const limit = parseInt(req.query.limit)
+
+    const startIndex = (page - 1) * limit
+    const endIndex = page * limit
+
+    const results = {}
+
+    if (endIndex < users.length){
+        results.next = {
+            page: page + 1,
+            limit: limit
+        }
+    }
+
+    if (startIndex > 0) {
+        results.previous = {
+            page: page - 1,
+            limit: limit
+        }
+    }
+
+    results.results = users.slice(startIndex, endIndex)
+    
+    res.json(results)
 })
 app.listen(3000)
